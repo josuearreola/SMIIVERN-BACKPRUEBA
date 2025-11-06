@@ -20,8 +20,11 @@ async function createNestServer(expressInstance) {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: ['https://smiivern-frontend.vercel.app', 'http://localhost:4200'],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204
   });
 
   // Configuración de Swagger
@@ -41,7 +44,7 @@ async function createNestServer(expressInstance) {
 
 // Agregar una ruta de prueba simple
 server.get('/', (req, res) => {
-  res.json({ message: 'SMIIVERN Backend API funcionando! 🚀', status: 'ok' });
+    res.json({ message: 'SMIIVERN Backend API funcionando!', status: 'ok' });
 });
 
 createNestServer(server)
