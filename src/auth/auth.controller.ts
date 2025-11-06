@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Get,
   Body,
   ValidationPipe,
   HttpCode,
@@ -19,6 +20,17 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly jwtService: JwtService,
   ) {}
+
+  @Get('test')
+  @ApiOperation({ summary: 'Probar que el controlador funciona' })
+  @ApiResponse({ status: 200, description: 'Controlador funcionando correctamente' })
+  testController() {
+    return { 
+      message: 'AuthController funcionando correctamente! 🚀', 
+      status: 'ok',
+      timestamp: new Date().toISOString()
+    };
+  }
 
   @Post('register')
   @ApiOperation({ summary: 'Registrar un nuevo usuario' })
