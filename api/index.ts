@@ -39,6 +39,11 @@ async function createNestServer(expressInstance) {
   return app;
 }
 
+// Agregar una ruta de prueba simple
+server.get('/', (req, res) => {
+  res.json({ message: 'SMIIVERN Backend API funcionando! 🚀', status: 'ok' });
+});
+
 createNestServer(server)
   .then(v => console.log('Nest Ready'))
   .catch(err => console.error('Nest broken', err));
