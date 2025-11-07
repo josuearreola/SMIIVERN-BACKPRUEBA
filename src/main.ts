@@ -13,7 +13,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: ['https://smiivern-frontend.vercel.app', 'http://localhost:4200'],
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   }); // Habilitar CORS
   // Configuración de Swagger
@@ -27,8 +28,9 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
-  console.log('Servidor corriendo en http://localhost:3000');
-  console.log('Documentación Swagger en http://localhost:3000/api');
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
+  console.log(`Servidor corriendo en puerto ${port}`);
+  console.log(`Documentación Swagger en http://localhost:${port}/api`);
 }
 bootstrap();
