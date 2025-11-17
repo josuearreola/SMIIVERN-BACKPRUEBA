@@ -1,6 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { User, TipoUsuario } from './user.entity';
 
 @Injectable()
@@ -105,6 +110,79 @@ export class UsersService {
     return {
       message: `Tipo de usuario actualizado a ${tipoUsuario} exitosamente`,
       user: updatedUser,
+    };
+  }
+
+  async updateProfile(
+    id: number,
+    profileData: { nombre: string; apellido: string; email: string },
+  ): Promise<{ message: string; user: User }> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    }
+
+    // Verificar si el email ya está en uso por otro usuario
+    if (profileData.email !== user.email) {
+      const existingUser = await this.userRepository.findOne({
+        where: { email: profileData.email },
+      });
+      if (existingUser) {
+        throw new BadRequestException(
+          'El email ya está en uso por otro usuario',
+        );
+      }
+    }
+
+    // Actualizar perfil
+    await this.userRepository.save({
+      ...user,
+      ...profileData,
+    });
+
+    return {
+      message: 'Perfil actualizado exitosamente',
+      user: await this.findById(id), // Devolver sin campos sensibles
+    };
+  }
+
+  async changePassword(
+    id: number,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<{ message: string }> {
+    // Buscar usuario con password para verificar
+    const user = await this.userRepository.findOne({
+      where: { id },
+      select: ['id', 'passwordHash'],
+    });
+
+    if (!user) {
+      throw new NotFoundException(`Usuario con ID ${id} no encontrado`);
+    }
+
+    // Verificar contraseña actual
+    const isCurrentPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.passwordHash,
+    );
+
+    if (!isCurrentPasswordValid) {
+      throw new BadRequestException('La contraseña actual es incorrecta');
+    }
+
+    // Hashear nueva contraseña
+    const saltRounds = 10;
+    const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
+
+    // Actualizar contraseña
+    await this.userRepository.save({
+      ...user,
+      passwordHash: hashedNewPassword,
+    });
+
+    return {
+      message: 'Contraseña cambiada exitosamente',
     };
   }
 }

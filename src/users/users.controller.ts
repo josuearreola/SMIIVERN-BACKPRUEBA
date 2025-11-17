@@ -117,4 +117,51 @@ export class UsersController {
       };
     }
   }
+
+  @Patch(':id/profile')
+  @HttpCode(HttpStatus.OK)
+  async updateProfile(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { nombre: string; apellido: string; email: string },
+  ) {
+    try {
+      const result = await this.usersService.updateProfile(id, body);
+      return {
+        success: true,
+        data: result.user,
+        message: result.message,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al actualizar perfil',
+        error: error.message,
+      };
+    }
+  }
+
+  @Patch(':id/change-password')
+  @HttpCode(HttpStatus.OK)
+  async changePassword(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: { currentPassword: string; newPassword: string },
+  ) {
+    try {
+      const result = await this.usersService.changePassword(
+        id,
+        body.currentPassword,
+        body.newPassword,
+      );
+      return {
+        success: true,
+        message: result.message,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: 'Error al cambiar contraseña',
+        error: error.message,
+      };
+    }
+  }
 }
