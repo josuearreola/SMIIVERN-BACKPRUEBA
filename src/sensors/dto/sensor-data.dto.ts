@@ -1,4 +1,10 @@
-import { IsString, IsDateString, ValidateNested, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsDateString,
+  ValidateNested,
+  IsOptional,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class SensorDataValuesDto {

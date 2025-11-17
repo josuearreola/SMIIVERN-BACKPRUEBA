@@ -24,7 +24,8 @@ export class SensorsService {
     return this.sensorDataRepository.save(sensorData);
   }
 
-  async getLatest(deviceId?: string): Promise<SensorData | null> {  // Cambia a | null
+  async getLatest(deviceId?: string): Promise<SensorData | null> {
+    // Cambia a | null
     const query = this.sensorDataRepository
       .createQueryBuilder('sensor')
       .orderBy('sensor.timestamp', 'DESC')
@@ -35,7 +36,10 @@ export class SensorsService {
     return query.getOne();
   }
 
-  async getHistory(deviceId: string, limit: number = 50): Promise<SensorData[]> {
+  async getHistory(
+    deviceId: string,
+    limit: number = 50,
+  ): Promise<SensorData[]> {
     return this.sensorDataRepository.find({
       where: { device_id: deviceId },
       order: { timestamp: 'DESC' },

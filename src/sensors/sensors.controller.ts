@@ -1,5 +1,18 @@
-import { Controller, Post, Get, Body, Query, UseGuards, ValidationPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Query,
+  UseGuards,
+  ValidationPipe,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { SensorsService } from './sensors.service';
 import { SensorDataDto } from './dto/sensor-data.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
