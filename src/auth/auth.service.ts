@@ -1,4 +1,9 @@
-import { Injectable, ConflictException, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -43,6 +48,14 @@ export class AuthService {
     if (!user) {
       throw new BadRequestException('Credenciales inválidas');
     }
+
+    // Verificar si el usuario está activo
+    if (!user.activo) {
+      throw new UnauthorizedException(
+        'Cuenta deshabilitada. Contacte al administrador.',
+      );
+    }
+
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       throw new BadRequestException('Credenciales inválidas');
@@ -50,7 +63,11 @@ export class AuthService {
     return user;
   }
   async login(user: User) {
-    const payload = { email: user.email, sub: user.id, tipoUsuario: user.tipoUsuario };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      tipoUsuario: user.tipoUsuario,
+    };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' }); // Access token corto
     const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' }); // Refresh token largo
 
@@ -63,7 +80,9 @@ export class AuthService {
   async refreshToken(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken);
-      const user = await this.userRepository.findOne({ where: { id: payload.sub } });
+      const user = await this.userRepository.findOne({
+        where: { id: payload.sub },
+      });
       if (!user || !(await bcrypt.compare(refreshToken, user.refreshToken))) {
         throw new UnauthorizedException('Invalid refresh token');
       }
