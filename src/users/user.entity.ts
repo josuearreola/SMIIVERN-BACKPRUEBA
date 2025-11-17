@@ -38,4 +38,7 @@ export class User {
 
   @UpdateDateColumn({ name: 'fecha_actualizacion' })
   fechaActualizacion: Date;
+
+  @Column ({ nullable: true})
+  refreshToken: string;
 }

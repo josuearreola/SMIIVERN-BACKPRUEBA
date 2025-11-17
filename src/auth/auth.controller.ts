@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Body,
-  ValidationPipe,
-  HttpCode,
-} from '@nestjs/common';
+import { Controller, Post, Body, ValidationPipe, HttpCode, UnauthorizedException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -18,19 +11,8 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-    private readonly jwtService: JwtService,
-  ) {}
-
-  @Get('test')
-  @ApiOperation({ summary: 'Probar que el controlador funciona' })
-  @ApiResponse({ status: 200, description: 'Controlador funcionando correctamente' })
-  testController() {
-    return { 
-      message: 'AuthController funcionando correctamente! 🚀', 
-      status: 'ok',
-      timestamp: new Date().toISOString()
-    };
-  }
+    private readonly jwtService: JwtService
+  ) { }
 
   @Post('register')
   @ApiOperation({ summary: 'Registrar un nuevo usuario' })
@@ -49,19 +31,20 @@ export class AuthController {
   })
   @ApiResponse({
     status: 201,
-    description: 'Usuario registrado exitosamente',
+    description: 'Usuario registrado exitosamente'
   })
   @ApiResponse({
     status: 409,
-    description: 'El email ya está registrado',
+    description: 'El email ya está registrado'
   })
   @ApiResponse({
     status: 400,
-    description: 'Datos inválidos',
+    description: 'Datos inválidos'
   })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
+
   @Post('login')
   @HttpCode(200)
   @ApiOperation({ summary: 'Iniciar sesión de usuario' })
@@ -77,24 +60,19 @@ export class AuthController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Login exitoso',
+    description: 'Login exitoso'
   })
   @ApiResponse({
     status: 400,
-    description: 'Credenciales inválidas',
+    description: 'Credenciales inválidas'
   })
   async login(@Body() body: { email: string; password: string }) {
     const user = await this.authService.validateUser(body.email, body.password);
-    // Si es válido, genera el JWT
-    const payload = {
-      sub: user.id,
-      email: user.email,
-      tipoUsuario: user.tipoUsuario,
-    };
-    const token = this.jwtService.sign(payload);
+    const tokens = await this.authService.login(user);
     return {
       message: 'Login exitoso',
-      access_token: token,
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -103,5 +81,29 @@ export class AuthController {
         tipoUsuario: user.tipoUsuario,
       },
     };
+  }
+
+  // Nuevo endpoint: Renueva access token usando refresh token
+  @Post('refresh')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Renovar access token' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        refreshToken: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Tokens renovados'
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Refresh token inválido'
+  })
+  async refresh(@Body() body: { refreshToken: string }) {
+    return this.authService.refreshToken(body.refreshToken);
   }
 }
