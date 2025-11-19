@@ -17,16 +17,29 @@ class SensorDataValuesDto {
   humidity?: number;
 
   @IsOptional()
-  @IsNumber()
-  conductivity?: number;
-
   @IsOptional()
   @IsNumber()
   ph?: number;
 
   @IsOptional()
   @IsNumber()
+  conductivity?: number;
+
+  @IsOptional()
+  @IsNumber()
   tds?: number;
+
+  @IsOptional()
+  @IsNumber()
+  n?: number; // Nitrógeno
+
+  @IsOptional()
+  @IsNumber()
+  p?: number; // Fósforo
+
+  @IsOptional()
+  @IsNumber()
+  k?: number; // Potasio
 }
 
 export class SensorDataDto {

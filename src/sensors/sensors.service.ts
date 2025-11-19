@@ -17,9 +17,12 @@ export class SensorsService {
       timestamp: new Date(dto.timestamp),
       temperature: dto.data.temperature,
       humidity: dto.data.humidity,
-      conductivity: dto.data.conductivity,
       ph: dto.data.ph,
+      conductivity: dto.data.conductivity,
       tds: dto.data.tds,
+      n: dto.data.n,
+      p: dto.data.p,
+      k: dto.data.k,
     });
     return this.sensorDataRepository.save(sensorData);
   }

@@ -19,8 +19,6 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('sensors')
 @Controller('sensors')
-@UseGuards(JwtAuthGuard) // Protege todos los endpoints con JWT
-@ApiBearerAuth() // Para Swagger
 export class SensorsController {
   constructor(private readonly sensorsService: SensorsService) {}
 
@@ -38,6 +36,8 @@ export class SensorsController {
   }
 
   @Get('latest')
+  @UseGuards(JwtAuthGuard) // Protege GETs con JWT para PWA
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener la última lectura de sensores' })
   @ApiResponse({ status: 200, description: 'Última lectura obtenida' })
   async getLatest(@Query('device_id') deviceId?: string) {
@@ -46,6 +46,8 @@ export class SensorsController {
   }
 
   @Get('history')
+  @UseGuards(JwtAuthGuard) // Protege GETs con JWT para PWA
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener histórico de lecturas de sensores' })
   @ApiResponse({ status: 200, description: 'Histórico obtenido' })
   async getHistory(
