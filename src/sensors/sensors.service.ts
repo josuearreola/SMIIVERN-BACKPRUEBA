@@ -13,7 +13,7 @@ export class SensorsService {
 
   async saveSensorData(dto: SensorDataDto): Promise<SensorData> {
     const sensorData = this.sensorDataRepository.create({
-      device_id: dto.device_id,
+      device_id: dto.device_id || null, // Permitir null si no se proporciona
       timestamp: new Date(dto.timestamp),
       temperature: dto.data.temperature,
       humidity: dto.data.humidity,
@@ -28,7 +28,6 @@ export class SensorsService {
   }
 
   async getLatest(deviceId?: string): Promise<SensorData | null> {
-    // Cambia a | null
     const query = this.sensorDataRepository
       .createQueryBuilder('sensor')
       .orderBy('sensor.timestamp', 'DESC')
@@ -41,17 +40,17 @@ export class SensorsService {
 
   async getHistory(
     deviceId?: string,
-    limit: number = 30,
+    limit: number = 50,
   ): Promise<SensorData[]> {
-    const queryBuilder = this.sensorDataRepository
+    const query = this.sensorDataRepository
       .createQueryBuilder('sensor')
       .orderBy('sensor.timestamp', 'DESC')
       .limit(limit);
-
+    
     if (deviceId) {
-      queryBuilder.where('sensor.device_id = :deviceId', { deviceId });
+      query.where('sensor.device_id = :deviceId', { deviceId });
     }
-
-    return queryBuilder.getMany();
+    
+    return query.getMany();
   }
 }

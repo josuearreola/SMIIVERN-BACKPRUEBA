@@ -1,10 +1,4 @@
-import {
-  IsString,
-  IsDateString,
-  ValidateNested,
-  IsOptional,
-  IsNumber,
-} from 'class-validator';
+import { IsString, IsDateString, ValidateNested, IsOptional, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class SensorDataValuesDto {
@@ -16,7 +10,6 @@ class SensorDataValuesDto {
   @IsNumber()
   humidity?: number;
 
-  @IsOptional()
   @IsOptional()
   @IsNumber()
   ph?: number;
@@ -31,20 +24,21 @@ class SensorDataValuesDto {
 
   @IsOptional()
   @IsNumber()
-  n?: number; // Nitrógeno
+  n?: number;  // Nitrógeno
 
   @IsOptional()
   @IsNumber()
-  p?: number; // Fósforo
+  p?: number;  // Fósforo
 
   @IsOptional()
   @IsNumber()
-  k?: number; // Potasio
+  k?: number;  // Potasio
 }
 
 export class SensorDataDto {
+  @IsOptional()
   @IsString()
-  device_id: string;
+  device_id?: string;
 
   @IsDateString()
   timestamp: string;
