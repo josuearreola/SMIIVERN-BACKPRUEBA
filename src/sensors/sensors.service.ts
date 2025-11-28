@@ -40,13 +40,18 @@ export class SensorsService {
   }
 
   async getHistory(
-    deviceId: string,
-    limit: number = 50,
+    deviceId?: string,
+    limit: number = 30,
   ): Promise<SensorData[]> {
-    return this.sensorDataRepository.find({
-      where: { device_id: deviceId },
-      order: { timestamp: 'DESC' },
-      take: limit,
-    });
+    const queryBuilder = this.sensorDataRepository
+      .createQueryBuilder('sensor')
+      .orderBy('sensor.timestamp', 'DESC')
+      .limit(limit);
+
+    if (deviceId) {
+      queryBuilder.where('sensor.device_id = :deviceId', { deviceId });
+    }
+
+    return queryBuilder.getMany();
   }
 }

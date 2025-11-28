@@ -51,7 +51,7 @@ export class SensorsController {
   @ApiOperation({ summary: 'Obtener histórico de lecturas de sensores' })
   @ApiResponse({ status: 200, description: 'Histórico obtenido' })
   async getHistory(
-    @Query('device_id') deviceId: string,
+    @Query('device_id') deviceId?: string,
     @Query('limit') limit?: number,
   ) {
     const data = await this.sensorsService.getHistory(deviceId, limit);
