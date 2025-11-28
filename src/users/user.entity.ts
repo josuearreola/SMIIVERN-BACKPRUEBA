@@ -33,6 +33,9 @@ export class User {
   @Column({ default: true })
   activo: boolean;
 
+  @Column({ default: 0 })
+  intentos: number;
+
   @CreateDateColumn({ name: 'fecha_creacion' })
   fechaCreacion: Date;
 

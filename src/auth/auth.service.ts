@@ -52,14 +52,36 @@ export class AuthService {
     // Verificar si el usuario está activo
     if (!user.activo) {
       throw new UnauthorizedException(
-        'Cuenta deshabilitada. Contacte al administrador.',
+        'Cuenta bloqueada por múltiples intentos fallidos. Contacte al administrador.',
       );
     }
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      throw new BadRequestException('Credenciales inválidas');
+      // Incrementar intentos fallidos
+      const nuevosIntentos = user.intentos + 1;
+      
+      if (nuevosIntentos >= 3) {
+        // Bloquear la cuenta después del 3er intento fallido
+        await this.userRepository.update(user.id, { 
+          intentos: nuevosIntentos,
+          activo: false 
+        });
+        throw new UnauthorizedException(
+          'Cuenta bloqueada por múltiples intentos fallidos. Contacte al administrador.',
+        );
+      } else {
+        // Actualizar solo los intentos
+        await this.userRepository.update(user.id, { intentos: nuevosIntentos });
+        throw new BadRequestException('Credenciales inválidas');
+      }
     }
+    
+    // Login exitoso: resetear intentos fallidos
+    if (user.intentos > 0) {
+      await this.userRepository.update(user.id, { intentos: 0 });
+    }
+    
     return user;
   }
   async login(user: User) {
