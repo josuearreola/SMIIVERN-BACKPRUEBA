@@ -57,4 +57,14 @@ export class SensorsController {
     const data = await this.sensorsService.getHistory(deviceId, limit);
     return data;
   }
+
+  @Get('stats')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Obtener estadísticas de los datos de sensores' })
+  @ApiResponse({ status: 200, description: 'Estadísticas obtenidas' })
+  async getStats() {
+    const stats = await this.sensorsService.getDataStats();
+    return stats;
+  }
 }
